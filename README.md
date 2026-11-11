@@ -28,7 +28,7 @@ Every answer follows the same four steps:
 
 The same questions as a filterable, flashcard-style study tool: filter by topic, difficulty and your own progress, full-text search, a drill mode, and progress saved in your browser.
 
-- **Open it:** [`docs/index.html`](docs/index.html) (enable GitHub Pages on the `docs/` folder to get a hosted URL)
+- **Open it:** <https://aminghuf.github.io/devops-interview-question-bank/> (served from the `docs/` folder via GitHub Pages)
 - Rebuild the data after editing questions: `python3 tools/build_playbook.py questions docs/bank.json`
 
 ## Download

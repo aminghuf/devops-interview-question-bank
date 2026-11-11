@@ -1,6 +1,13 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="567 real DevOps/SRE interview questions, filterable by topic and difficulty, with flashcard reveal, drill mode and saved progress.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230f7a8a'/%3E%3Ctext x='16' y='22' font-size='17' font-family='monospace' font-weight='700' text-anchor='middle' fill='white'%3E%3E_%3C/text%3E%3C/svg%3E">
 <title>DevOps Interview Playbook</title>
-<meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>html{color-scheme:light}body{margin:0;font-family:system-ui,sans-serif;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
 <style>
 /* Layout: a fixed filter rail on the left (topics / levels / progress), a question list in the middle,
    and a reading pane on the right that doubles as a flashcard. On phones the rail becomes a top drawer
@@ -154,7 +161,8 @@ button.ghost{background:transparent}
 }
 @media (prefers-reduced-motion:no-preference){.bar i{transition:width .3s}}
 </style>
-
+</head>
+<body>
 <div class="app">
   <aside class="rail" id="rail">
     <div class="brand" style="display:flex;flex-direction:row;justify-content:space-between;align-items:flex-start">
@@ -405,3 +413,5 @@ button.ghost{background:transparent}
   }).catch(err=>{$("#groups").innerHTML='<div class="empty">Could not load the question bank ('+esc(String(err))+'). Reload the page.</div>'});
 })();
 </script>
+</body>
+</html>
