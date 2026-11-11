@@ -1,0 +1,407 @@
+<title>DevOps Interview Playbook</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a fixed filter rail on the left (topics / levels / progress), a question list in the middle,
+   and a reading pane on the right that doubles as a flashcard. On phones the rail becomes a top drawer
+   and the reading pane becomes a full-screen sheet. */
+:root{
+  --bg:#f4f6f8; --panel:#ffffff; --fg:#1a2230; --muted:#5d6b7c; --line:#d9e0e8; --soft:#eaeff4;
+  --accent:#0f7a8a; --accent-fg:#ffffff; --accent-soft:#dcf1f4;
+  --basic:#1f8f4e; --basic-soft:#dff3e6; --adv:#b76a00; --adv-soft:#fbeed4; --scen:#6b4fbb; --scen-soft:#ebe5fa;
+  --known:#1f8f4e; --review:#c2410c; --code-bg:#1b2230; --code-fg:#e4e9f1;
+  --sans:"IBM Plex Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --radius:10px; --shadow:0 1px 2px rgba(20,30,45,.06),0 8px 24px rgba(20,30,45,.08);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f141b; --panel:#171e27; --fg:#e6ebf1; --muted:#98a5b5; --line:#2a3441; --soft:#1f2834;
+  --accent:#3dc0d2; --accent-fg:#06161a; --accent-soft:#143a41;
+  --basic:#4fcf85; --basic-soft:#153826; --adv:#f0a63a; --adv-soft:#3d2a10; --scen:#a98bff; --scen-soft:#2b2347;
+  --known:#4fcf85; --review:#fb923c; --code-bg:#0b1016; --code-fg:#dfe6ee; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f141b; --panel:#171e27; --fg:#e6ebf1; --muted:#98a5b5; --line:#2a3441; --soft:#1f2834;
+  --accent:#3dc0d2; --accent-fg:#06161a; --accent-soft:#143a41;
+  --basic:#4fcf85; --basic-soft:#153826; --adv:#f0a63a; --adv-soft:#3d2a10; --scen:#a98bff; --scen-soft:#2b2347;
+  --known:#4fcf85; --review:#fb923c; --code-bg:#0b1016; --code-fg:#dfe6ee; color-scheme:dark}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:15px;line-height:1.55}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:6px 10px}
+button:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button.primary{background:var(--accent);color:var(--accent-fg);border-color:var(--accent);font-weight:600}
+button.ghost{background:transparent}
+.app{display:grid;grid-template-columns:260px minmax(0,1fr) minmax(0,1.25fr);height:100%;
+  padding-left:max(0px,env(safe-area-inset-left,0px));padding-right:max(0px,env(safe-area-inset-right,0px))}
+.rail,.list,.pane{min-width:0;height:100%;overflow:auto}
+.rail{border-right:1px solid var(--line);background:var(--panel);padding:18px 16px;display:flex;flex-direction:column;gap:18px}
+.list{padding:14px 16px 40px}
+.pane{border-left:1px solid var(--line);background:var(--panel);padding:0 0 40px}
+
+.brand{display:flex;flex-direction:column;gap:4px}
+.brand h1{margin:0;font-size:17px;font-weight:700;letter-spacing:-.01em}
+.brand small{color:var(--muted);font-family:var(--mono);font-size:12px}
+.sec-label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;margin:0 0 6px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:4px 10px;font-size:13px;display:inline-flex;gap:6px;align-items:center}
+.chip.on{background:var(--accent-soft);border-color:var(--accent);color:var(--fg);font-weight:600}
+.chip .cnt{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.chip.lvl-basic.on{background:var(--basic-soft);border-color:var(--basic)}
+.chip.lvl-advanced.on{background:var(--adv-soft);border-color:var(--adv)}
+.chip.lvl-scenario.on{background:var(--scen-soft);border-color:var(--scen)}
+.topic-list{display:flex;flex-direction:column;gap:4px}
+.topic-row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;border:1px solid transparent;border-radius:8px;padding:6px 8px;background:transparent;text-align:left}
+.topic-row.on{background:var(--accent-soft);border-color:var(--accent)}
+.topic-row .nm{font-size:13.5px;font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.topic-row .pct{font-family:var(--mono);font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.bar{grid-column:1/-1;height:4px;border-radius:2px;background:var(--soft);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--known);width:0}
+.bar i.r{background:var(--review)}
+.bar{display:flex}
+.stat{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.stat div{background:var(--bg);border-radius:8px;padding:8px;text-align:center}
+.stat b{display:block;font-size:18px;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.stat span{font-size:11px;color:var(--muted)}
+.rail .foot{margin-top:auto;font-size:12px;color:var(--muted);line-height:1.5}
+.rail .foot a{color:var(--accent)}
+
+.toolbar{position:sticky;top:0;z-index:5;background:var(--bg);padding:4px 0 10px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.search{flex:1 1 220px;min-width:0;display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:0 10px}
+.search input{flex:1;min-width:0;border:0;background:transparent;padding:8px 0}
+.search kbd{font-family:var(--mono);font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 5px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--panel)}
+.seg button{border:0;border-radius:0;padding:7px 10px;font-size:13px}
+.seg button.on{background:var(--accent);color:var(--accent-fg);font-weight:600}
+.meta-line{font-size:12.5px;color:var(--muted);margin:2px 0 10px;font-variant-numeric:tabular-nums}
+
+.group{margin:18px 0 6px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.group h2{margin:0;font-size:14px;font-weight:700}
+.group .lvl{font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:700;padding:2px 8px;border-radius:4px}
+.lvl.basic{color:var(--basic);background:var(--basic-soft)} .lvl.advanced{color:var(--adv);background:var(--adv-soft)} .lvl.scenario{color:var(--scen);background:var(--scen-soft)}
+.group small{color:var(--muted);font-family:var(--mono);font-size:11px}
+.qs{display:flex;flex-direction:column;gap:4px}
+.q{display:grid;grid-template-columns:8px 1fr auto;gap:10px;align-items:start;width:100%;text-align:left;border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:9px 12px;line-height:1.4}
+.q:hover{border-color:var(--accent)}
+.q.sel{border-color:var(--accent);box-shadow:inset 3px 0 0 var(--accent)}
+.q .stripe{width:4px;align-self:stretch;border-radius:2px;background:var(--line);margin-top:2px}
+.q.basic .stripe{background:var(--basic)} .q.advanced .stripe{background:var(--adv)} .q.scenario .stripe{background:var(--scen)}
+.q .t{font-size:14px;min-width:0}
+.q .t small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+.q .st{font-family:var(--mono);font-size:11px;padding:2px 7px;border-radius:999px;background:var(--soft);color:var(--muted);white-space:nowrap}
+.q .st.known{background:var(--basic-soft);color:var(--known)} .q .st.review{background:var(--adv-soft);color:var(--review)}
+.empty{color:var(--muted);padding:40px 10px;text-align:center}
+
+.pane-head{position:sticky;top:0;z-index:5;background:var(--panel);border-bottom:1px solid var(--line);padding:12px 20px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.pane-head .crumbs{flex:1 1 200px;min-width:0;font-size:12px;color:var(--muted);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.pane-body{padding:18px 22px;max-width:76ch}
+.pane-body h2.qt{margin:0 0 6px;font-size:20px;line-height:1.3;text-wrap:balance;letter-spacing:-.01em}
+.also{font-size:13px;color:var(--muted);margin:0 0 14px}
+.also b{color:var(--fg);font-weight:600}
+.asked{display:inline-flex;flex-wrap:wrap;gap:6px;align-items:baseline;margin:0 0 14px;padding:6px 10px;border-radius:6px;background:var(--scen-soft);font-size:13px}
+.asked b{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--scen)}
+.step{border:1px solid var(--line);border-radius:var(--radius);margin:12px 0;overflow:hidden}
+.step>summary,.step>.hd{list-style:none;cursor:pointer;display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 14px;background:var(--soft);font-weight:600;font-size:13.5px}
+.step>summary::-webkit-details-marker{display:none}
+.step>summary::after{content:"Show";font-size:12px;color:var(--accent);font-weight:600}
+.step[open]>summary::after{content:"Hide"}
+.step .bd{padding:4px 14px 12px}
+.step.say{border-color:var(--accent)} .step.say>summary{background:var(--accent-soft)}
+.step.simple .bd{font-size:15.5px}
+.md p{margin:.6em 0} .md ul,.md ol{padding-left:1.3em;margin:.5em 0} .md li{margin:.2em 0}
+.md h3,.md h4{font-size:14px;margin:1em 0 .3em}
+.md blockquote{margin:.8em 0;padding:8px 12px;border-left:3px solid var(--adv);background:var(--adv-soft);border-radius:0 8px 8px 0}
+.md blockquote p{margin:.3em 0}
+.md code{font-family:var(--mono);font-size:.9em;background:var(--soft);padding:1px 5px;border-radius:4px}
+.md pre{background:var(--code-bg);color:var(--code-fg);padding:12px 14px;border-radius:8px;overflow-x:auto;font-size:12.5px;line-height:1.5}
+.md pre code{background:transparent;padding:0;color:inherit;font-size:inherit}
+.md table{border-collapse:collapse;font-size:13px;display:block;overflow-x:auto;max-width:100%}
+.md th,.md td{border:1px solid var(--line);padding:5px 8px;text-align:left;vertical-align:top}
+.md th{background:var(--soft)}
+.md hr{border:0;border-top:1px solid var(--line)}
+.md a{color:var(--accent)}
+.rate{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 6px;align-items:center}
+.rate button{padding:9px 14px;font-weight:600}
+.rate .k{border-color:var(--known);color:var(--known)} .rate .k.on{background:var(--known);color:#fff}
+.rate .r{border-color:var(--review);color:var(--review)} .rate .r.on{background:var(--review);color:#fff}
+.hint{font-size:12px;color:var(--muted)} .hint kbd{font-family:var(--mono);border:1px solid var(--line);border-radius:4px;padding:0 5px;font-size:11px}
+.navrow{display:flex;gap:8px;justify-content:space-between;margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
+.welcome{padding:40px 26px;max-width:62ch;color:var(--muted)}
+.welcome h2{color:var(--fg);font-size:18px;margin:0 0 8px}
+.welcome ol{padding-left:1.2em} .welcome li{margin:.4em 0}
+.welcome b{color:var(--fg)}
+.drill-banner{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:0 0 14px;padding:10px 14px;border-radius:8px;background:var(--scen-soft);border:1px solid var(--scen);font-size:13px}
+.drill-banner b{font-variant-numeric:tabular-nums}
+.only-mobile{display:none}
+.collapsible{display:contents}
+
+@media (max-width:1100px){
+  .app{grid-template-columns:230px minmax(0,1fr)}
+  .pane{position:fixed;inset:0;z-index:20;border:0;display:none;padding-top:env(safe-area-inset-top,0px)}
+  .pane.open{display:block}
+}
+@media (max-width:720px){.only-mobile{display:inline-flex}}
+@media (max-width:720px){
+  .app{display:block;height:auto}
+  .rail{height:auto;border-right:0;border-bottom:1px solid var(--line);padding:14px max(16px,env(safe-area-inset-right,0px)) 14px max(16px,env(safe-area-inset-left,0px))}
+  .rail:not(.open) .collapsible{display:none}
+  .list{height:auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  .pane-body{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  .pane-head{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  .toolbar{top:0}
+}
+@media (prefers-reduced-motion:no-preference){.bar i{transition:width .3s}}
+</style>
+
+<div class="app">
+  <aside class="rail" id="rail">
+    <div class="brand" style="display:flex;flex-direction:row;justify-content:space-between;align-items:flex-start">
+      <div>
+        <h1>DevOps Interview Playbook</h1>
+        <small>567 questions · 11 topics · 3 levels</small>
+      </div>
+      <button class="only-mobile ghost" id="railToggle" aria-label="Show filters" style="display:none">Filters</button>
+    </div>
+
+    <div class="collapsible">
+      <div>
+        <p class="sec-label">Your progress</p>
+        <div class="stat">
+          <div><b id="sKnown">0</b><span>known</span></div>
+          <div><b id="sReview">0</b><span>to review</span></div>
+          <div><b id="sLeft">567</b><span>unseen</span></div>
+        </div>
+      </div>
+
+      <div>
+        <p class="sec-label">Difficulty</p>
+        <div class="chips" id="levelChips"></div>
+      </div>
+
+      <div>
+        <p class="sec-label">Status</p>
+        <div class="chips" id="statusChips">
+          <button class="chip on" data-status="all">All</button>
+          <button class="chip" data-status="unseen">Unseen</button>
+          <button class="chip" data-status="review">To review</button>
+          <button class="chip" data-status="known">Known</button>
+        </div>
+      </div>
+
+      <div>
+        <p class="sec-label">Topics</p>
+        <div class="topic-list" id="topicList"></div>
+      </div>
+
+      <div>
+        <p class="sec-label">Suggested path</p>
+        <div class="chips">
+          <button class="chip" data-path="week">Interview in 1–2 weeks</button>
+          <button class="chip" data-path="beginner">Beginner start</button>
+          <button class="chip" data-path="sre">SRE / troubleshooting</button>
+          <button class="chip" data-path="eu">European product company</button>
+        </div>
+      </div>
+
+      <div class="foot">
+        Source: <a href="https://github.com/aminghuf/devops-interview-question-bank" target="_blank" rel="noopener">devops-interview-question-bank</a> (529 questions from real interview write-ups) plus a Europe topic of 38 questions built from Adyen, Monzo, Booking.com, Zalando, Spotify, N26 and Italian/German company interview reports. Progress is saved in this browser only.
+        <div style="margin-top:8px"><button class="ghost" id="resetBtn" style="font-size:12px">Reset progress</button></div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="list" id="list">
+    <div class="toolbar">
+      <label class="search"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Search questions, commands, keywords…" autocomplete="off"><kbd>/</kbd></label>
+      <div class="seg" id="groupSeg" role="group" aria-label="Group by">
+        <button data-group="topic" class="on">By topic</button>
+        <button data-group="level">By difficulty</button>
+      </div>
+      <button class="primary" id="drillBtn">Drill me</button>
+    </div>
+    <div class="meta-line" id="metaLine"></div>
+    <div id="groups"></div>
+  </main>
+
+  <section class="pane" id="pane" aria-live="polite">
+    <div class="welcome" id="welcome">
+      <h2>Pick a question, or hit <b>Drill me</b>.</h2>
+      <p>Every answer unfolds in the order you should learn it:</p>
+      <ol>
+        <li><b>In simple words</b>: an everyday analogy so the idea sticks.</li>
+        <li><b>Detailed answer</b>: the real explanation, with triage order for scenario questions and runnable examples.</li>
+        <li><b>What to say to the interviewer</b>: a 2–3 line answer to practise out loud.</li>
+      </ol>
+      <p>Cover the answer, say yours, then compare. Mark each one <b>Known</b> or <b>Review</b>; the rail tracks your coverage per topic. Keys: <kbd>j</kbd>/<kbd>k</kbd> next/previous, <kbd>space</kbd> reveal the next step, <kbd>1</kbd> known, <kbd>2</kbd> review, <kbd>/</kbd> search.</p>
+    </div>
+    <div id="detail" hidden></div>
+  </section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+<script>
+(function(){
+  const LEVELS=[["basic","Basic"],["advanced","Advanced"],["scenario","Scenario"]];
+  const LVL_RANK={basic:0,advanced:1,scenario:2};
+  const PATHS={
+    week:{levels:["basic","scenario","advanced"],note:"Most interviews are troubleshooting-heavy: Basic, then Scenario, then Advanced for your target stack."},
+    beginner:{levels:["basic"],note:"Read only the simple-words boxes first, then come back for the detail."},
+    sre:{levels:["scenario"],note:"Scenario questions across the stack an SRE loop actually probes."},
+    eu:{levels:["basic","advanced","scenario"],topic:"europe",note:"What European product companies add on top of the fundamentals: process, compliance, sovereignty, design rounds."}
+  };
+  let DATA={topics:[],questions:[]}, byId={};
+  let state={topic:null,levels:new Set(["basic","advanced","scenario"]),status:"all",q:"",group:"topic",sel:null,drill:false,drillQueue:[],drillDone:0,pathNote:""};
+  let progress={}; // id -> "known" | "review"
+  try{progress=JSON.parse(localStorage.getItem("dip-progress")||"{}")||{}}catch(e){progress={}}
+  function save(){try{localStorage.setItem("dip-progress",JSON.stringify(progress))}catch(e){}}
+  const $=s=>document.querySelector(s);
+  const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  marked.setOptions({gfm:true,breaks:false});
+
+  function filtered(){
+    const q=state.q.trim().toLowerCase();
+    return DATA.questions.filter(x=>{
+      if(state.topic&&x.topic!==state.topic)return false;
+      if(!state.levels.has(x.level))return false;
+      const st=progress[x.id]||"unseen";
+      if(state.status!=="all"&&st!==state.status)return false;
+      if(q){const hay=(x.q+" "+x.also+" "+(x.asked||"")+" "+x.simple+" "+x.say+" "+x.body).toLowerCase(); if(!hay.includes(q))return false;}
+      return true;
+    });
+  }
+  function topicName(id){const t=DATA.topics.find(t=>t.id===id);return t?t.name:id}
+  function lvlName(l){return LEVELS.find(x=>x[0]===l)[1]}
+
+  function renderRail(){
+    const known=Object.values(progress).filter(v=>v==="known").length, review=Object.values(progress).filter(v=>v==="review").length;
+    $("#sKnown").textContent=known; $("#sReview").textContent=review; $("#sLeft").textContent=DATA.questions.length-known-review;
+    const lc=$("#levelChips"); lc.innerHTML="";
+    LEVELS.forEach(([id,nm])=>{
+      const n=DATA.questions.filter(x=>x.level===id&&(!state.topic||x.topic===state.topic)).length;
+      const b=document.createElement("button"); b.className="chip lvl-"+id+(state.levels.has(id)?" on":""); b.innerHTML=esc(nm)+' <span class="cnt">'+n+'</span>';
+      b.onclick=()=>{ if(state.levels.has(id)&&state.levels.size>1)state.levels.delete(id); else state.levels.add(id); state.pathNote=""; render(); };
+      lc.appendChild(b);
+    });
+    document.querySelectorAll("#statusChips .chip").forEach(c=>c.classList.toggle("on",c.dataset.status===state.status));
+    const tl=$("#topicList"); tl.innerHTML="";
+    const all=document.createElement("button"); all.className="topic-row"+(state.topic===null?" on":""); all.innerHTML='<span class="nm">All topics</span><span class="pct">'+DATA.questions.length+'</span>';
+    all.onclick=()=>{state.topic=null;render()}; tl.appendChild(all);
+    DATA.topics.forEach(t=>{
+      const qs=DATA.questions.filter(x=>x.topic===t.id); const k=qs.filter(x=>progress[x.id]==="known").length, r=qs.filter(x=>progress[x.id]==="review").length;
+      const b=document.createElement("button"); b.className="topic-row"+(state.topic===t.id?" on":"");
+      b.innerHTML='<span class="nm">'+esc(t.name)+'</span><span class="pct">'+k+'/'+qs.length+'</span><span class="bar"><i style="width:'+(100*k/qs.length)+'%"></i><i class="r" style="width:'+(100*r/qs.length)+'%"></i></span>';
+      b.onclick=()=>{state.topic=state.topic===t.id?null:t.id;render()}; tl.appendChild(b);
+    });
+  }
+
+  function renderList(){
+    const items=filtered();
+    document.querySelectorAll("#groupSeg button").forEach(b=>b.classList.toggle("on",b.dataset.group===state.group));
+    $("#metaLine").textContent=items.length+" of "+DATA.questions.length+" questions"+(state.q?' matching “'+state.q+'”':"")+(state.pathNote?" · "+state.pathNote:"");
+    const g=$("#groups"); g.innerHTML="";
+    if(!items.length){g.innerHTML='<div class="empty">Nothing matches these filters.</div>';return}
+    // order: topic order then level rank then n  (or level rank then topic then n)
+    const tIdx=Object.fromEntries(DATA.topics.map((t,i)=>[t.id,i]));
+    items.sort((a,b)=>state.group==="topic"
+      ?(tIdx[a.topic]-tIdx[b.topic])||(LVL_RANK[a.level]-LVL_RANK[b.level])||(a.n-b.n)
+      :(LVL_RANK[a.level]-LVL_RANK[b.level])||(tIdx[a.topic]-tIdx[b.topic])||(a.n-b.n));
+    let lastKey=null, wrap=null;
+    items.forEach(x=>{
+      const key=state.group==="topic"?x.topic+"|"+x.level:x.level+"|"+x.topic;
+      if(key!==lastKey){
+        lastKey=key;
+        const h=document.createElement("div"); h.className="group";
+        const cnt=items.filter(y=>(state.group==="topic"?y.topic+"|"+y.level:y.level+"|"+y.topic)===key).length;
+        h.innerHTML=(state.group==="topic"?'<h2>'+esc(topicName(x.topic))+'</h2><span class="lvl '+x.level+'">'+lvlName(x.level)+'</span>':'<span class="lvl '+x.level+'">'+lvlName(x.level)+'</span><h2>'+esc(topicName(x.topic))+'</h2>')+'<small>'+cnt+'</small>';
+        g.appendChild(h); wrap=document.createElement("div"); wrap.className="qs"; g.appendChild(wrap);
+      }
+      const st=progress[x.id];
+      const b=document.createElement("button"); b.className="q "+x.level+(state.sel===x.id?" sel":""); b.dataset.id=x.id;
+      b.innerHTML='<span class="stripe"></span><span class="t">'+esc(x.q)+(x.also?'<small>Also asked as: '+esc(x.also)+'</small>':"")+'</span><span class="st '+(st||"")+'">'+(st==="known"?"known":st==="review"?"review":"Q"+x.n)+'</span>';
+      b.onclick=()=>open(x.id,false);
+      wrap.appendChild(b);
+    });
+  }
+
+  function visibleOrder(){return Array.from(document.querySelectorAll("#groups .q")).map(b=>b.dataset.id)}
+
+  function open(id,fromDrill){
+    state.sel=id; const x=byId[id]; if(!x)return;
+    if(!fromDrill){state.drill=false}
+    $("#welcome").hidden=true; const d=$("#detail"); d.hidden=false;
+    const st=progress[id];
+    const ord=state.drill?state.drillQueue:visibleOrder(); const i=ord.indexOf(id);
+    d.innerHTML=
+      '<div class="pane-head"><div class="crumbs"><span>'+esc(topicName(x.topic))+'</span><span>›</span><span class="lvl '+x.level+'">'+lvlName(x.level)+'</span><span>Q'+x.n+'</span></div>'+
+      '<button class="ghost" id="closePane">Close</button></div>'+
+      '<div class="pane-body">'+
+      (state.drill?'<div class="drill-banner">Drill: <b>'+(state.drillDone+1)+' / '+state.drillQueue.length+'</b> · say your answer out loud before revealing anything <button class="ghost" id="stopDrill" style="margin-left:auto">Stop drill</button></div>':"")+
+      '<h2 class="qt">'+esc(x.q)+'</h2>'+(x.also?'<p class="also"><b>Also asked as:</b> '+esc(x.also)+'</p>':"")+(x.asked?'<p class="asked"><b>Asked at</b> '+esc(x.asked)+'</p>':"")+
+      '<details class="step simple"'+(state.drill?"":" open")+'><summary>In simple words</summary><div class="bd md">'+marked.parse(x.simple)+'</div></details>'+
+      '<details class="step full"'+(state.drill?"":" open")+'><summary>Detailed answer</summary><div class="bd md">'+marked.parse(x.body)+'</div></details>'+
+      '<details class="step say"'+(state.drill?"":" open")+'><summary>What to say to the interviewer</summary><div class="bd md">'+marked.parse(x.say)+'</div></details>'+
+      '<div class="rate"><button class="k'+(st==="known"?" on":"")+'" data-rate="known">✓ Known</button><button class="r'+(st==="review"?" on":"")+'" data-rate="review">↻ Review later</button>'+(st?'<button class="ghost" data-rate="">Clear</button>':"")+'<span class="hint"><kbd>1</kbd> known · <kbd>2</kbd> review · <kbd>space</kbd> reveal · <kbd>j</kbd>/<kbd>k</kbd> next/prev</span></div>'+
+      '<div class="navrow"><button id="prevQ"'+(i<=0?" disabled":"")+'>← Previous</button><button id="nextQ" class="primary"'+(i>=ord.length-1?" disabled":"")+'>'+(state.drill?"Next in drill →":"Next →")+'</button></div>'+
+      '</div>';
+    d.querySelectorAll("[data-rate]").forEach(b=>b.onclick=()=>rate(b.dataset.rate));
+    $("#closePane").onclick=()=>{$("#pane").classList.remove("open")};
+    $("#prevQ").onclick=()=>step(-1); $("#nextQ").onclick=()=>step(1);
+    const sd=$("#stopDrill"); if(sd)sd.onclick=()=>{state.drill=false;open(id,false);renderList()};
+    $("#pane").classList.add("open"); $("#pane").scrollTop=0;
+    document.querySelectorAll("#groups .q").forEach(b=>b.classList.toggle("sel",b.dataset.id===id));
+    const el=document.querySelector('#groups .q[data-id="'+CSS.escape(id)+'"]'); if(el&&!fromDrill&&window.innerWidth>720)el.scrollIntoView({block:"nearest"});
+  }
+  function rate(v){ if(!state.sel)return; if(v)progress[state.sel]=v; else delete progress[state.sel]; save(); renderRail();
+    if(state.drill){ step(1); } else { open(state.sel,false); renderList(); } }
+  function step(dir){
+    const ord=state.drill?state.drillQueue:visibleOrder(); const i=ord.indexOf(state.sel); const j=i+dir;
+    if(j<0||j>=ord.length){ if(state.drill&&dir>0){finishDrill()} return }
+    if(state.drill)state.drillDone=j;
+    open(ord[j],state.drill);
+  }
+  function finishDrill(){
+    state.drill=false; const d=$("#detail"); const n=state.drillQueue.length;
+    const k=state.drillQueue.filter(id=>progress[id]==="known").length, r=state.drillQueue.filter(id=>progress[id]==="review").length;
+    d.innerHTML='<div class="pane-head"><div class="crumbs">Drill finished</div><button class="ghost" id="closePane">Close</button></div><div class="pane-body"><h2 class="qt">'+n+' questions drilled</h2><p>'+k+' known · '+r+' to review · '+(n-k-r)+' unrated.</p><p class="hint">Filter Status → “To review” and drill again to close the gaps.</p><div class="navrow"><button class="primary" id="againBtn">Drill again</button></div></div>';
+    $("#closePane").onclick=()=>$("#pane").classList.remove("open"); $("#againBtn").onclick=startDrill; renderList();
+  }
+  function startDrill(){
+    let pool=filtered().map(x=>x.id); if(!pool.length)return;
+    const unseen=pool.filter(id=>!progress[id]), review=pool.filter(id=>progress[id]==="review"), known=pool.filter(id=>progress[id]==="known");
+    const shuf=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+    // review items first, then unseen, then known; cap at 15 per session
+    state.drillQueue=[...shuf(review),...shuf(unseen),...shuf(known)].slice(0,15); state.drillDone=0; state.drill=true;
+    open(state.drillQueue[0],true);
+  }
+  function revealNext(){
+    const steps=document.querySelectorAll("#detail details.step"); for(const s of steps){ if(!s.open){s.open=true;return} }
+  }
+
+  function render(){renderRail();renderList();}
+
+  // wiring
+  $("#search").addEventListener("input",e=>{state.q=e.target.value;renderList()});
+  document.querySelectorAll("#statusChips .chip").forEach(c=>c.onclick=()=>{state.status=c.dataset.status;render()});
+  document.querySelectorAll("#groupSeg button").forEach(b=>b.onclick=()=>{state.group=b.dataset.group;renderList()});
+  document.querySelectorAll("[data-path]").forEach(b=>b.onclick=()=>{
+    const p=PATHS[b.dataset.path]; state.levels=new Set(p.levels); state.topic=p.topic||null; state.status="all"; state.pathNote=p.note; state.group=b.dataset.path==="week"?"level":"topic";
+    render(); window.scrollTo(0,0);
+  });
+  $("#drillBtn").onclick=startDrill;
+  $("#resetBtn").onclick=()=>{ if($("#resetBtn").dataset.arm){progress={};save();delete $("#resetBtn").dataset.arm;$("#resetBtn").textContent="Reset progress";render();if(state.sel)open(state.sel,state.drill)} else {$("#resetBtn").dataset.arm="1";$("#resetBtn").textContent="Click again to confirm reset";setTimeout(()=>{delete $("#resetBtn").dataset.arm;$("#resetBtn").textContent="Reset progress"},4000)} };
+  const rt=$("#railToggle"); rt.style.display=""; rt.onclick=()=>$("#rail").classList.toggle("open");
+  document.addEventListener("keydown",e=>{
+    const tag=(e.target.tagName||"").toLowerCase(); if(tag==="input"||tag==="textarea"){ if(e.key==="Escape")e.target.blur(); return }
+    if(e.key==="/"){e.preventDefault();$("#search").focus();return}
+    if(!state.sel)return;
+    if(e.key==="j")step(1); else if(e.key==="k")step(-1); else if(e.key===" "){e.preventDefault();revealNext()} else if(e.key==="1")rate("known"); else if(e.key==="2")rate("review"); else if(e.key==="Escape")$("#pane").classList.remove("open");
+  });
+
+  fetch("bank.json").then(r=>r.json()).then(d=>{
+    DATA=d; d.questions.forEach(x=>byId[x.id]=x); render();
+    if(location.hash==="#drill")startDrill();
+  }).catch(err=>{$("#groups").innerHTML='<div class="empty">Could not load the question bank ('+esc(String(err))+'). Reload the page.</div>'});
+})();
+</script>

@@ -1,11 +1,11 @@
 # DevOps Interview Question Bank
 
-![Questions](https://img.shields.io/badge/questions-529-blue)
-![Topics](https://img.shields.io/badge/topics-10-green)
+![Questions](https://img.shields.io/badge/questions-567-blue)
+![Topics](https://img.shields.io/badge/topics-11-green)
 ![Levels](https://img.shields.io/badge/levels-Basic%20%7C%20Advanced%20%7C%20Scenario-orange)
 ![License](https://img.shields.io/badge/license-CC%20BY%204.0-lightgrey)
 
-**529 real DevOps / SRE / Cloud interview questions** gathered from interview experiences people shared publicly
+**567 real DevOps / SRE / Cloud interview questions** gathered from interview experiences people shared publicly
 (TCS, Accenture, PwC, product companies, Google SRE loops and more). They are de-duplicated,
 grouped by topic and level, and answered in **plain language first**, then with real depth.
 
@@ -23,6 +23,13 @@ Every answer follows the same four steps:
 > Prometheus collects *metrics* not logs, and VPC endpoints reach AWS services, *not* the internet).
 
 ---
+
+## Interactive playbook
+
+The same questions as a filterable, flashcard-style study tool: filter by topic, difficulty and your own progress, full-text search, a drill mode, and progress saved in your browser.
+
+- **Open it:** [`docs/index.html`](docs/index.html) (enable GitHub Pages on the `docs/` folder to get a hosted URL)
+- Rebuild the data after editing questions: `python3 tools/build_playbook.py questions docs/bank.json`
 
 ## Download
 
@@ -43,7 +50,8 @@ Every answer follows the same four steps:
 | 08 | Monitoring, Observability, SRE & Scale Design | 9 | 15 | 8 | **32** | [Read](questions/08-monitoring-observability-sre.md) | [PDF](pdf/by-topic/08_Monitoring_Observability_SRE_Scale_Design.pdf) |
 | 09 | Behavioral & Project Experience (STAR samples) | 9 | - | 10 | **19** | [Read](questions/09-behavioral.md) | [PDF](pdf/by-topic/09_Behavioral_Project_Experience.pdf) |
 | 10 | Shell Scripting: 24 real interview scripts | 7 | 8 | 9 | **24** | [Read](questions/10-shell-scripting.md) | [PDF](pdf/by-topic/10_Shell_Scripting_24_Real_Interview_Scripts.pdf) |
-| | **Total** | **178** | **178** | **173** | **529** | | |
+| 11 | Europe: companies, compliance & process (Adyen, Monzo, Booking.com, Zalando, N26, Spotify, Italian/German companies) | 12 | 12 | 14 | **38** | [Read](questions/11-europe.md) | - |
+| | **Total** | **190** | **190** | **187** | **567** | | |
 
 ## What a question looks like
 
@@ -68,6 +76,8 @@ Every answer follows the same four steps:
 4. **Run the examples** in a free-tier or local lab (kind/minikube, Docker, a sandbox AWS account). Hands-on answers sound different.
 
 ## Scope notes
+
+- Topic 11 covers what European product companies add on top of the fundamentals: interview format (timeboxed take-homes, pairing, design and live-troubleshooting rounds), GDPR, data residency and sovereignty, NIS2/DORA/CRA, EU cloud providers, GitLab CI / GitOps defaults, and payments-grade reliability. Each question lists the companies known to probe it ("Asked at"), based on public interview reports and company guides.
 
 - Only DevOps content: language-specific (Python/PHP) questions and pure network-hardware questions were left out.
 - Questions asked in several different wordings are merged into one; the alternatives are listed as *"Also asked as"*.
